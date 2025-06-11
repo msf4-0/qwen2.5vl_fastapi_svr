@@ -1,0 +1,135 @@
+[
+    {
+        "id": "1",
+        "type": "tab",
+        "label": "Qwen2.5 Inference",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "to-api",
+        "type": "function",
+        "z": "1",
+        "name": "Prepare API Request",
+        "func": "msg.headers = {\n    \"content-type\" : 'multipart/form-data'\n    };\nlet imageBuffer = msg.payload;\nlet prompt = msg.prompt;\n\nmsg.payload = {\n    \"prompt\": prompt,\n    \"image\": {\n        \"value\": imageBuffer,\n        \"options\": {\n            \"filename\": \"upload.jpg\",\n            \"contentType\": \"image/jpeg\"\n        }\n    }\n}\nreturn msg;\n\n// const formData = new FormData();\n// formData.append(\"prompt\", msg.prompt);\n// formData.append(\"image\", {\n//     value: Buffer.from(msg.payload),\n//     options: {\n//         filename: \"upload.jpg\",\n//         contentType: \"image/jpeg\"\n//     }\n// });\n\n// msg.headers = formData.getHeaders ? formData.getHeaders() : { 'Content-Type': 'multipart/form-data' };\n// msg.payload = formData;\n// return msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 540,
+        "y": 560,
+        "wires": [
+            [
+                "http-request"
+            ]
+        ]
+    },
+    {
+        "id": "http-request",
+        "type": "http request",
+        "z": "1",
+        "name": "Send to Qwen2.5 API",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://0.0.0.0:8000/infer",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 780,
+        "y": 560,
+        "wires": [
+            [
+                "380730e9b4c8b551"
+            ]
+        ]
+    },
+    {
+        "id": "64e697db74b1a502",
+        "type": "inject",
+        "z": "1",
+        "name": "Prompt",
+        "props": [
+            {
+                "p": "prompt",
+                "v": "What are in the image?",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 190,
+        "y": 560,
+        "wires": [
+            [
+                "274bbb4ad18b7bd4"
+            ]
+        ]
+    },
+    {
+        "id": "274bbb4ad18b7bd4",
+        "type": "file in",
+        "z": "1",
+        "name": "Read img",
+        "filename": "C:\\Users\\User\\path\\to\\img",
+        "filenameType": "str",
+        "format": "",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 340,
+        "y": 560,
+        "wires": [
+            [
+                "to-api"
+            ]
+        ]
+    },
+    {
+        "id": "bde59d1e0080d6c4",
+        "type": "debug",
+        "z": "1",
+        "name": "Answer from Qwen2.5VL",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1170,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "380730e9b4c8b551",
+        "type": "split",
+        "z": "1",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "property": "payload.answer",
+        "x": 970,
+        "y": 560,
+        "wires": [
+            [
+                "bde59d1e0080d6c4"
+            ]
+        ]
+    }
+]
